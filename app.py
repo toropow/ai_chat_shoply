@@ -1,0 +1,100 @@
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.chat_history import InMemoryChatMessageHistory
+from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_ollama import ChatOllama
+from langchain_community.llms import Ollama
+import json
+from dotenv import load_dotenv
+load_dotenv()
+import os
+
+import logging
+
+MODEL = os.getenv("OLLAMA_MODEL")
+SESSION_ID = "user_123"
+
+print("This is model:",MODEL)
+
+logging.basicConfig(
+    filename=f"logs/session_{SESSION_ID}.json",
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    encoding="utf-8"
+)
+
+
+
+def load_json(path) -> dict:
+    with open(path, "r") as f:
+        return json.load(f)
+
+# Создаём класс для CLI-бота
+class ClicBot:
+    def __init__(self):
+        # Создаём модель
+        self.chat_model = Ollama(model=MODEL, temperature=0)
+        # self.chat_model = ChatOllama(model=MODEL, temperature=0, base_url="http://localhost:11434")
+
+        # Создаём Хранилище истории
+        self.store = {}
+
+        # Создаем шаблон промпта
+        self.prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", "Ты полезный и вежливый ассистент. Отвечай кратко и по делу"),
+                MessagesPlaceholder(variable_name="history"),
+                ("human", "{question}"),
+            ]
+        )
+
+        # Создаём цепочку (тут используется синтаксис LCEL*)
+        self.chain = self.prompt | self.chat_model
+
+        # Создаём цепочку с историей
+        self.chain_with_history = RunnableWithMessageHistory(
+            self.chain,  # Цепочка с историей
+            self.get_session_history,  # метод для получения истории
+            input_messages_key="question",  # ключ для вопроса
+            history_messages_key="history",  # ключ для истории
+        )
+
+    # Метод для получения истории по session_id
+    def get_session_history(self, session_id: str):
+        if session_id not in self.store:
+            self.store[session_id] = InMemoryChatMessageHistory()
+        return self.store[session_id]
+
+    def __call__(self, session_id):
+        logging.info("=== New session ===")
+        while True:
+            try:
+                user_text = input("Вы: ").strip()
+                logging.info(f"User: {user_text}")
+            except (KeyboardInterrupt, EOFError):
+                print("\nБот: Завершение работы.")
+                break
+            if not user_text:
+                continue
+
+            msg = user_text.lower()
+            if msg in ("выход", "стоп", "конец"):
+                print("Бот: До свидания!")
+                break
+            if msg == "сброс":
+                if session_id in self.store:
+                    del self.store[session_id]
+                print("Бот: Контекст диалога очищен.")
+                continue
+
+            response = self.chain_with_history.invoke(
+                {"question": user_text}, {"configurable": {"session_id": session_id}}
+            )
+            print("Бот: ", response)
+            logging.info(f"Bot: {response}")
+
+        logging.info("=== End session ===")
+
+if __name__ == "__main__":
+    bot = ClicBot()
+    bot(SESSION_ID)
