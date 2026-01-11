@@ -1,6 +1,0 @@
-2026-01-11 18:29:23 [INFO] === New session ===
-2026-01-11 18:29:26 [INFO] User: 7+7
-2026-01-11 18:29:27 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
-2026-01-11 18:29:27 [INFO] Bot: 14
-2026-01-11 18:29:27 [INFO] Tokens: input_tokens - 41, output_tokens - 3, total_tokens - 44
-2026-01-11 18:29:32 [INFO] === End session ===

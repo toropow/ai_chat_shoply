@@ -2,18 +2,20 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.chat_history import InMemoryChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_ollama import ChatOllama
-from langchain_community.llms import Ollama
 import json
 from dotenv import load_dotenv
-load_dotenv()
-import os
+from uuid import uuid4
 
+import os
 import logging
 
-MODEL = os.getenv("OLLAMA_MODEL")
-SESSION_ID = "user_123"
+load_dotenv()
 
-print("This is model:",MODEL)
+MODEL = os.getenv("OLLAMA_MODEL")
+SESSION_ID = str(uuid4())
+NUM_MESSAGE_HISTORY = os.getenv("NUM_MESSAGE_HISTORY")
+FAQ = os.path.join("data", "faq.json")
+ORDERS = os.path.join("data", "order.json")
 
 logging.basicConfig(
     filename=f"logs/session_{SESSION_ID}.json",
@@ -24,10 +26,13 @@ logging.basicConfig(
 )
 
 
-
 def load_json(path) -> dict:
     with open(path, "r") as f:
         return json.load(f)
+
+def prepare_faq() -> str:
+    return "\n".join([f"Вопрос: {item[q]} Ответ: {item[a]}" for item in load_json(FAQ) ])
+
 
 # Создаём класс для CLI-бота
 class ClicBot:
@@ -41,8 +46,8 @@ class ClicBot:
         # Создаем шаблон промпта
         self.prompt = ChatPromptTemplate.from_messages(
             [
-                ("system", "Ты полезный и вежливый ассистент. Отвечай кратко и по делу"),
-                MessagesPlaceholder(variable_name="history"),
+                ("system", f"Ты полезный и вежливый ассистент. Отвечай кратко и по делу. Для ответов на вопросы пользователя используй официальный faq { prepare_faq()}, где q - вопрос пользователя, a - эталонный ответ"),
+                MessagesPlaceholder(variable_name="history", n_messages=NUM_MESSAGE_HISTORY),
                 ("human", "{question}"),
             ]
         )
