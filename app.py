@@ -46,7 +46,7 @@ class ClicBot:
         # Создаем шаблон промпта
         self.prompt = ChatPromptTemplate.from_messages(
             [
-                ("system", f"Ты полезный и вежливый ассистент. Отвечай кратко и по делу. Для ответов на вопросы пользователя используй официальный faq {prepare_faq()}, где q - вопрос пользователя, a - эталонный ответ"),
+                ("system", f"Ты полезный и вежливый ассистент. Отвечай кратко и по делу. Для ответов на вопросы пользователя используй официальный faq {prepare_faq()}"),
                 MessagesPlaceholder(variable_name="history", n_messages=NUM_MESSAGE_HISTORY),
                 ("human", "{question}"),
             ]
