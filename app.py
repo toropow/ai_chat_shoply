@@ -17,12 +17,13 @@ NUM_MESSAGE_HISTORY = os.getenv("NUM_MESSAGE_HISTORY")
 FAQ = os.path.join("data", "faq.json")
 ORDERS = os.path.join("data", "order.json")
 
+
 logging.basicConfig(
     filename=f"logs/session_{SESSION_ID}.json",
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
-    encoding="utf-8"
+    encoding="utf-8",
 )
 
 
@@ -30,8 +31,9 @@ def load_json(path) -> dict:
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
+
 def prepare_faq() -> str:
-    return "\n".join([f"Вопрос: {item['q']} Ответ: {item['a']}" for item in load_json(FAQ) ])
+    return "\n".join([f"Вопрос: {item['q']} Ответ: {item['a']}" for item in load_json(FAQ)])
 
 
 # Создаём класс для CLI-бота
@@ -46,7 +48,11 @@ class ClicBot:
         # Создаем шаблон промпта
         self.prompt = ChatPromptTemplate.from_messages(
             [
-                ("system", f"Ты полезный и вежливый ассистент. Отвечай кратко и по делу. Для ответов на вопросы пользователя используй официальный faq {prepare_faq()}"),
+                (
+                    "system",
+                    f"Ты полезный и вежливый ассистент. Отвечай кратко и по делу. Для ответов на вопросы пользователя используй официальный вопросы и ответы {prepare_faq()}. "
+                    f"Отвечай только на вопросы из офциальных вопросов и отетов, если не знаешь ответ - не отвечай, вежливо откажи пользователю и предложить позвать оператора",
+                ),
                 MessagesPlaceholder(variable_name="history", n_messages=NUM_MESSAGE_HISTORY),
                 ("human", "{question}"),
             ]
@@ -70,6 +76,7 @@ class ClicBot:
         return self.store[session_id]
 
     def __call__(self, session_id):
+        order_dict = load_json(ORDERS)
         logging.info("=== New session ===")
         while True:
             try:
@@ -91,6 +98,17 @@ class ClicBot:
                 print("Бот: Контекст диалога очищен.")
                 continue
 
+            if msg.startswith("/order"):
+                order_id = msg.split()[1]
+                order_info = order_dict.get(order_id)
+
+                if order_info:
+                    context_query = f"Заказ {order_id} найден. У тебя есть информация о заказе {order_info}"
+                else:
+                    context_query = f"Закак {order_id} не найден в базе. Откажи пользователю вежливо"
+
+                user_text = context_query
+
             response = self.chain_with_history.invoke(
                 {"question": user_text}, {"configurable": {"session_id": session_id}}
             )
@@ -99,10 +117,12 @@ class ClicBot:
             tokens = response.usage_metadata
             print("Бот: ", answer)
             logging.info(f"Bot: {answer}")
-            logging.info(f"Tokens: input_tokens - {tokens['input_tokens']}, output_tokens - {tokens['output_tokens']}, total_tokens - {tokens['total_tokens']}")
-
+            logging.info(
+                f"Tokens: input_tokens - {tokens['input_tokens']}, output_tokens - {tokens['output_tokens']}, total_tokens - {tokens['total_tokens']}"
+            )
 
         logging.info("=== End session ===")
+
 
 if __name__ == "__main__":
     bot = ClicBot()

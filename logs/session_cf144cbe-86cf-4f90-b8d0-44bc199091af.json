@@ -1,0 +1,22 @@
+2026-01-11 22:55:33 [INFO] === New session ===
+2026-01-11 22:55:49 [INFO] User: /order 11111
+2026-01-11 22:55:49 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-01-11 22:55:50 [INFO] Bot: К сожалению, информации по этому вопросу у меня нет. Пожалуйста, обратитесь к оператору для получения помощи.
+2026-01-11 22:55:50 [INFO] Tokens: input_tokens - 265, output_tokens - 26, total_tokens - 291
+2026-01-11 22:55:57 [INFO] User: /order 12345
+2026-01-11 22:55:57 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-01-11 22:55:58 [INFO] Bot: Отлично! Статус заказа 12345 – в пути. Доставка ожидается через 2 рабочих дня. Транспортер – ShoplyExpress.
+2026-01-11 22:55:58 [INFO] Tokens: input_tokens - 341, output_tokens - 36, total_tokens - 377
+2026-01-11 22:56:06 [INFO] User: Какой статус заказа?
+2026-01-11 22:56:07 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-01-11 22:56:07 [INFO] Bot: Статус заказа 12345 – в пути.
+2026-01-11 22:56:07 [INFO] Tokens: input_tokens - 365, output_tokens - 14, total_tokens - 379
+2026-01-11 22:56:24 [INFO] User: Как я могу оплатить заказ?
+2026-01-11 22:56:25 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-01-11 22:56:25 [INFO] Bot: Вы можете оплатить заказ картами Visa/Mastercard, СБП, или подарочными сертификатами Shoply.
+2026-01-11 22:56:25 [INFO] Tokens: input_tokens - 319, output_tokens - 26, total_tokens - 345
+2026-01-11 22:56:55 [INFO] User: Сколько дней в неделе?
+2026-01-11 22:56:55 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-01-11 22:56:55 [INFO] Bot: К сожалению, я не знаю ответ на этот вопрос. Пожалуйста, обратитесь к оператору.
+2026-01-11 22:56:55 [INFO] Tokens: input_tokens - 312, output_tokens - 22, total_tokens - 334
+2026-01-11 22:57:04 [INFO] === End session ===
