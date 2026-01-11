@@ -27,11 +27,11 @@ logging.basicConfig(
 
 
 def load_json(path) -> dict:
-    with open(path, "r") as f:
+    with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
 def prepare_faq() -> str:
-    return "\n".join([f"Вопрос: {item[q]} Ответ: {item[a]}" for item in load_json(FAQ) ])
+    return "\n".join([f"Вопрос: {item['q']} Ответ: {item['a']}" for item in load_json(FAQ) ])
 
 
 # Создаём класс для CLI-бота
@@ -46,7 +46,7 @@ class ClicBot:
         # Создаем шаблон промпта
         self.prompt = ChatPromptTemplate.from_messages(
             [
-                ("system", f"Ты полезный и вежливый ассистент. Отвечай кратко и по делу. Для ответов на вопросы пользователя используй официальный faq { prepare_faq()}, где q - вопрос пользователя, a - эталонный ответ"),
+                ("system", f"Ты полезный и вежливый ассистент. Отвечай кратко и по делу. Для ответов на вопросы пользователя используй официальный faq {prepare_faq()}, где q - вопрос пользователя, a - эталонный ответ"),
                 MessagesPlaceholder(variable_name="history", n_messages=NUM_MESSAGE_HISTORY),
                 ("human", "{question}"),
             ]
