@@ -33,8 +33,7 @@ def load_json(path) -> dict:
 class ClicBot:
     def __init__(self):
         # Создаём модель
-        self.chat_model = Ollama(model=MODEL, temperature=0)
-        # self.chat_model = ChatOllama(model=MODEL, temperature=0, base_url="http://localhost:11434")
+        self.chat_model = ChatOllama(model=MODEL, temperature=0)
 
         # Создаём Хранилище истории
         self.store = {}
@@ -90,8 +89,13 @@ class ClicBot:
             response = self.chain_with_history.invoke(
                 {"question": user_text}, {"configurable": {"session_id": session_id}}
             )
-            print("Бот: ", response)
-            logging.info(f"Bot: {response}")
+
+            answer = response.content.strip()
+            tokens = response.usage_metadata
+            print("Бот: ", answer)
+            logging.info(f"Bot: {answer}")
+            logging.info(f"Tokens: input_tokens - {tokens['input_tokens']}, output_tokens - {tokens['output_tokens']}, total_tokens - {tokens['total_tokens']}")
+
 
         logging.info("=== End session ===")
 
