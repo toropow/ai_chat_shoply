@@ -1,3 +1,3 @@
-langchain_core
-langchain_ollama
-langchain_community
+langchain-core==1.2.6
+langchain-ollama==1.0.1
+langchain-community==0.4.1
